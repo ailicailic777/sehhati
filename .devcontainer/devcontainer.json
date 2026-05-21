@@ -1,0 +1,19 @@
+{
+    "name": "Sehhati PHP",
+    "image": "mcr.microsoft.com/devcontainers/php:8.2",
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {},
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+    "postCreateCommand": "composer install && cp .env.example .env && php artisan key:generate && touch database/database.sqlite && php artisan migrate --seed",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bmewburn.vscode-intelephense-client",
+                "bradlc.vscode-tailwindcss",
+                "donjayamanne.githistory",
+                "github.vscode-github-actions"
+            ]
+        }
+    }
+}
