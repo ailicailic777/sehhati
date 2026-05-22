@@ -15,13 +15,13 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer update --no-interaction --no-dev --optimize-autoloader
-
-RUN php artisan key:generate
-
-RUN chown -R www-data:www-data storage bootstrap/cache
-
-RUN php artisan storage:link
+RUN echo '' > .env && \
+    composer update --no-interaction --no-dev --no-scripts --optimize-autoloader && \
+    php artisan key:generate --force && \
+    php artisan storage:link --force || true && \
+    cp docker-entrypoint.sh /usr/local/bin/ && \
+    chmod +x /usr/local/bin/docker-entrypoint.sh && \
+    chown -R www-data:www-data storage bootstrap/cache public
 
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
@@ -33,4 +33,5 @@ RUN echo '<VirtualHost *:80>\n\
 
 EXPOSE 80
 
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]

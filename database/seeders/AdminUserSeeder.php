@@ -10,9 +10,8 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
+        User::firstOrCreate(['email' => 'admin@sehhati.dz'], [
             'name' => 'مدير المنصة',
-            'email' => 'admin@sehhati.dz',
             'password' => Hash::make('password'),
             'phone' => '0555000000',
             'role' => 'admin',

@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok', 'app' => 'Sehhati', 'time' => now()->toIso8601String()]);
+});
+
 Route::get('/', function () {
     return view('pages.landing');
 })->name('landing');

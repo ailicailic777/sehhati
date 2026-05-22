@@ -28,7 +28,7 @@ class SpecialtySeeder extends Seeder
         ];
 
         foreach ($specialties as $spec) {
-            DB::table('specialties')->insert($spec);
+            DB::table('specialties')->insertOrIgnore($spec);
         }
     }
 }
