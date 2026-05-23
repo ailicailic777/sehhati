@@ -1,11 +1,25 @@
 FROM php:8.2-apache
 
+# Install system deps + PHP extensions
 RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
     libzip-dev \
+    libicu-dev \
+    libcurl4-openssl-dev \
+    libpng-dev \
+    libxml2-dev \
     unzip \
     git \
-    && docker-php-ext-install pdo pdo_sqlite zip
+    && docker-php-ext-install -j$(nproc) \
+    pdo \
+    pdo_sqlite \
+    zip \
+    bcmath \
+    curl \
+    gd \
+    intl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN a2enmod rewrite
 
@@ -15,11 +29,13 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN echo '' > .env && \
-    composer update --no-interaction --no-dev --no-scripts --optimize-autoloader && \
-    php artisan key:generate --force && \
-    php artisan storage:link --force || true && \
-    cp docker-entrypoint.sh /usr/local/bin/ && \
+# Create .env, install dependencies, setup app
+RUN echo "APP_KEY=" > .env && \
+    composer update --no-interaction --no-scripts --optimize-autoloader 2>&1 && \
+    php artisan key:generate --force 2>&1 && \
+    php artisan storage:link --force 2>&1 || true
+
+RUN cp docker-entrypoint.sh /usr/local/bin/ && \
     chmod +x /usr/local/bin/docker-entrypoint.sh && \
     chown -R www-data:www-data storage bootstrap/cache public
 
