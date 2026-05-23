@@ -1,23 +1,12 @@
 FROM php:8.2-apache
 
-# Install system deps + PHP extensions
 RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
     libzip-dev \
-    libicu-dev \
     libcurl4-openssl-dev \
-    libpng-dev \
-    libxml2-dev \
     unzip \
     git \
-    && docker-php-ext-install -j$(nproc) \
-    pdo \
-    pdo_sqlite \
-    zip \
-    bcmath \
-    curl \
-    gd \
-    intl \
+    && docker-php-ext-install -j$(nproc) pdo_sqlite zip curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -29,15 +18,18 @@ WORKDIR /var/www/html
 
 COPY . .
 
-# Create .env, install dependencies, setup app
-RUN echo "APP_KEY=" > .env && \
-    composer update --no-interaction --no-scripts --optimize-autoloader 2>&1 && \
-    php artisan key:generate --force 2>&1 && \
-    php artisan storage:link --force 2>&1 || true
+RUN echo "" > .env
 
-RUN cp docker-entrypoint.sh /usr/local/bin/ && \
-    chmod +x /usr/local/bin/docker-entrypoint.sh && \
-    chown -R www-data:www-data storage bootstrap/cache public
+RUN composer update --no-interaction --optimize-autoloader 2>&1
+
+RUN php artisan key:generate --force 2>&1
+
+RUN php artisan storage:link --force 2>&1 || true
+
+RUN chown -R www-data:www-data storage bootstrap/cache public
+
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
