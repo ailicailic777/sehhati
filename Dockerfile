@@ -19,3 +19,5 @@ RUN printf "APP_NAME=Sehhati\nAPP_ENV=production\nAPP_DEBUG=false\nDB_CONNECTION
     chmod -R 775 bootstrap/cache storage
 
 EXPOSE 80 443
+
+CMD ["supervisord"]
